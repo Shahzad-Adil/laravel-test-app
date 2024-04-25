@@ -9,6 +9,8 @@ use Tests\TestCase;
 
 class ProductsTest extends TestCase
 {
+    use RefreshDatabase;
+
     public function test_products_homepage_contains_empty_table(): void
     {
         $response = $this->get('/products');
