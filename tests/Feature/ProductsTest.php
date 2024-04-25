@@ -22,12 +22,14 @@ class ProductsTest extends TestCase
 
     public function test_products_homepage_contains_non_empty_table(): void
     {
-        Product::factory()->create();
+        $product = Product::factory()->create();
 
         $response = $this->get('/products');
 
         $response->assertStatus(200);
 
-        $response->assertDontSee('No products found');
+        $response->assertViewHas('products', function ($products) use ($product) {
+            return $products->contains($product);
+        });
     }
 }
