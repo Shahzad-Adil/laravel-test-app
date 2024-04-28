@@ -6,6 +6,7 @@ use Tests\TestCase;
 use App\Models\Product;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class ProductsTest extends TestCase
 {
@@ -28,8 +29,23 @@ class ProductsTest extends TestCase
 
         $response->assertStatus(200);
 
-        $response->assertViewHas('products', function ($products) use ($product) {
+        $response->assertViewHas('products', function (LengthAwarePaginator $products) use ($product) {
             return $products->contains($product);
+        });
+    }
+
+    public function test_paginated_products_table_doesnt_contain_11th_record(): void
+    {
+        $products = Product::factory(11)->create();
+
+        $lastProduct = $products->last();
+
+        $response = $this->get('/products');
+
+        $response->assertStatus(200);
+
+        $response->assertViewHas('products', function (LengthAwarePaginator $products) use ($lastProduct) {
+            return $products->doesntContain($lastProduct);
         });
     }
 }
