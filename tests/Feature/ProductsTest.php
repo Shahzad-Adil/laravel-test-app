@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use Tests\TestCase;
 use App\Models\Product;
+use App\Models\User;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -14,7 +15,9 @@ class ProductsTest extends TestCase
 
     public function test_products_homepage_contains_empty_table(): void
     {
-        $response = $this->get('/products');
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->get('/products');
 
         $response->assertStatus(200);
 
@@ -25,7 +28,9 @@ class ProductsTest extends TestCase
     {
         $product = Product::factory()->create();
 
-        $response = $this->get('/products');
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->get('/products');
 
         $response->assertStatus(200);
 
@@ -40,7 +45,9 @@ class ProductsTest extends TestCase
 
         $lastProduct = $products->last();
 
-        $response = $this->get('/products');
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->get('/products');
 
         $response->assertStatus(200);
 
