@@ -15,11 +15,15 @@ class ProductsTest extends TestCase
 
     private User $user;
 
+    private User $admin;
+
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->user = $this->createUser();
+
+        $this->admin = $this->createUser(isAdmin: true);
     }
 
     public function test_products_homepage_contains_empty_table(): void
@@ -59,8 +63,42 @@ class ProductsTest extends TestCase
         });
     }
 
-    public function createUser(): User
+    public function test_admin_can_see_products_create_button(): void
     {
-        return User::factory()->create();
+        $response = $this->actingAs($this->admin)->get('/products');
+
+        $response->assertStatus(200);
+
+        $response->assertSee('Create Product');
+    }
+
+    public function test_non_admin_cannot_see_products_create_button(): void
+    {
+        $response = $this->actingAs($this->user)->get('/products');
+
+        $response->assertStatus(200);
+
+        $response->assertDontSee('Create Product');
+    }
+
+    public function test_admin_can_access_product_create_page(): void
+    {
+        $response = $this->actingAs($this->admin)->get('/products/create');
+
+        $response->assertStatus(200);
+    }
+
+    public function test_non_admin_cannot_access_product_create_page(): void
+    {
+        $response = $this->actingAs($this->user)->get('/products/create');
+
+        $response->assertStatus(403);
+    }
+
+    public function createUser(bool $isAdmin = false ): User
+    {
+        return User::factory([
+            'is_admin' => $isAdmin
+        ])->create();
     }
 }

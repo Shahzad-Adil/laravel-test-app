@@ -16,5 +16,6 @@ class Product extends Model
     protected $fillable = [
         'name',
         'price',
+        'is_admin'
     ];
 }
