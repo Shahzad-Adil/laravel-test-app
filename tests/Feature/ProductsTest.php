@@ -3,21 +3,28 @@
 namespace Tests\Feature;
 
 use Tests\TestCase;
-use App\Models\Product;
 use App\Models\User;
+use App\Models\Product;
 use Illuminate\Foundation\Testing\WithFaker;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class ProductsTest extends TestCase
 {
     use RefreshDatabase;
 
+    private User $user;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->user = $this->createUser();
+    }
+
     public function test_products_homepage_contains_empty_table(): void
     {
-        $user = User::factory()->create();
-
-        $response = $this->actingAs($user)->get('/products');
+        $response = $this->actingAs($this->user)->get('/products');
 
         $response->assertStatus(200);
 
@@ -28,9 +35,7 @@ class ProductsTest extends TestCase
     {
         $product = Product::factory()->create();
 
-        $user = User::factory()->create();
-
-        $response = $this->actingAs($user)->get('/products');
+        $response = $this->actingAs($this->user)->get('/products');
 
         $response->assertStatus(200);
 
@@ -45,14 +50,17 @@ class ProductsTest extends TestCase
 
         $lastProduct = $products->last();
 
-        $user = User::factory()->create();
-
-        $response = $this->actingAs($user)->get('/products');
+        $response = $this->actingAs($this->user)->get('/products');
 
         $response->assertStatus(200);
 
         $response->assertViewHas('products', function (LengthAwarePaginator $products) use ($lastProduct) {
             return $products->doesntContain($lastProduct);
         });
+    }
+
+    public function createUser(): User
+    {
+        return User::factory()->create();
     }
 }
