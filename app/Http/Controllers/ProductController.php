@@ -28,4 +28,9 @@ class ProductController extends Controller
 
         return redirect()->route('products.index');
     }
+
+    public function edit(Product $product): View
+    {
+        return view('products.edit', compact('product'));
+    }
 }
